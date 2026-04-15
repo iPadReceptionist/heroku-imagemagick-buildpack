@@ -1,16 +1,25 @@
-FROM heroku/heroku:22-build
+FROM heroku/heroku:24-build
+
+# heroku-24 build images default to the non-root `heroku` user; switch to root so apt-get
+# can install build dependencies. (heroku-22 ran as root by default.)
+USER root
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 ARG COMPILE_VERSION_LIBDE265=1.0.9
 ARG COMPILE_VERSION_LIBAOM=3.5.0
-ARG COMPILE_VERSION_LIBHEIF=1.14.0
+# libheif 1.14.0 fails on gcc 13 (Ubuntu 24.04) with -Werror=maybe-uninitialized in
+# heif_colorconversion.cc. 1.15.x has the fix.
+ARG COMPILE_VERSION_LIBHEIF=1.15.2
+# ImageMagick 7.1.0-53 pre-dates gcc 13; bumping to the 7.1.1 line for the same reason.
 ARG COMPILE_VERSION_LIBWEBP=1.2.4
-ARG COMPILE_VERSION_IMAGEMAGICK=7.1.0-53
+ARG COMPILE_VERSION_IMAGEMAGICK=7.1.1-38
 
 RUN apt-get -yq update \
-  # Needed for libaom library cmake optimizations
-  && apt-get install -yq yasm \
+  # yasm for libaom cmake optimizations; lib*-dev headers so ImageMagick's configure links
+  # against the stack's system JPEG/PNG/TIFF/GIF libraries on Ubuntu 24.04. Pinning these
+  # explicitly guarantees reproducibility if the base image ever drops pre-installed headers.
+  && apt-get install -yq yasm libtiff-dev libjpeg-dev libpng-dev libgif-dev \
   # Install the latest libde265 library
   && curl -sSL --retry 3 https://github.com/strukturag/libde265/releases/download/v$COMPILE_VERSION_LIBDE265/libde265-$COMPILE_VERSION_LIBDE265.tar.gz | tar zx \
   && cd libde265-$COMPILE_VERSION_LIBDE265 \

@@ -1,17 +1,17 @@
 # heroku-buildpack-imagemagick-heif
 
-The rise in popularity and use of HEIF/HEIC(High Efficency Image Format) means your project's image processing also needs to be able to handle this format.
-The current default version of imagemagick installed on heroku:22 dynos is a version 6.xx and does not support processing heic image files.
+The rise in popularity and use of HEIF/HEIC (High Efficiency Image Format) means your project's image processing also needs to be able to handle this format.
+The default ImageMagick shipped in the Heroku stacks is a 6.x build from Ubuntu and does not support processing HEIC image files.
 
-This [Heroku buildpack](https://devcenter.heroku.com/articles/buildpacks) vendors a version of ImageMagick with **WEBP and HEIF support** binaries into your project.
+This [Heroku buildpack](https://devcenter.heroku.com/articles/buildpacks) vendors a version of ImageMagick 7 with **WEBP and HEIF support** into your project.
 
-This one works was built for [**Heroku stack 20**](https://devcenter.heroku.com/articles/stack).
+This fork targets [**heroku-24**](https://devcenter.heroku.com/articles/heroku-24-stack) (Ubuntu 24.04). It was rebuilt because the upstream yespark tarball linked against `libtiff.so.5` from Ubuntu 22.04, which Ubuntu 24.04 drops in favour of `libtiff.so.6`. Running that tarball on heroku-24 fails at runtime with `error while loading shared libraries: libtiff.so.5: cannot open shared object file`. Rebuilding inside `heroku/heroku:24-build` re-links against the stack's `libtiff6`.
 
 The tar file in the [/build folder](./build) currently contains:
 
-Version: ImageMagick 7.1.0-53
+Version: ImageMagick 7.1.0-53 (linked against Ubuntu 24.04 system libraries)
 
-You will need to build a new binary if you want to use a newer or different version. To build a new binary see [How to Build a New Binary](#how-to-build-a-new-binary)
+You will need to build a new binary if you want to use a newer or different version, or target a different stack. See [How to Build a New Binary](#how-to-build-a-new-binary).
 
 # Usage
 
@@ -38,6 +38,8 @@ heroku builds:cache:purge -a HEROKU_APP_NAME
 
 The binary in this repo was built in a heroku:22 docker image running in a local dev environment.
 However, there is a script called [**build.sh**](./build.sh) made to build a tar file through docker easily, it will be copied to the `build` directory. Then you should commit this changes to your git, and adjust the buildpack url previously mentionned just above.
+
+The binary currently in this repo was built inside a `heroku/heroku:24-build` Docker image. To retarget another stack, change the `FROM` line in [`container/Dockerfile`](./container/Dockerfile) to the matching Heroku build image (e.g. `heroku/heroku:22-build` for heroku-22) and rerun `./build.sh`.
 
 ## Prerequisites
 
