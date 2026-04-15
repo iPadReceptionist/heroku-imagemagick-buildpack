@@ -20,7 +20,7 @@ You will need to build a new binary if you want to use a newer or different vers
 From your projects "Settings" tab add this buildpack to your app in the 1st position:
 
 ```bash
-https://github.com/yespark/heroku-imagemagick-buildpack
+https://github.com/iPadReceptionist/heroku-imagemagick-buildpack
 ```
 
 **NOTE:** \__To ensure the newer version of imagemagick is found in the $PATH and installed first make sure this buildpack is added to the top of the buildpack list or at "index 1"._
@@ -45,6 +45,10 @@ However, there is a script called [**build.sh**](./build.sh) made to build a tar
 
 ## Credits
 
+This buildpack is a fork of [yespark/heroku-imagemagick-buildpack](https://github.com/yespark/heroku-imagemagick-buildpack), maintained by The Receptionist.
+
+Other references:
+
 - https://medium.com/@eplt/5-minutes-to-install-imagemagick-with-heic-support-on-ubuntu-18-04-digitalocean-fe2d09dcef1
 - https://github.com/brandoncc/heroku-buildpack-vips
 - https://github.com/steeple-dev/heroku-buildpack-imagemagick
@@ -52,4 +56,4 @@ However, there is a script called [**build.sh**](./build.sh) made to build a tar
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://github.com/yespark/heroku-imagemagick-buildpack/blob/master/LICENSE).
+The gem is available as open source under the terms of the [MIT License](https://github.com/iPadReceptionist/heroku-imagemagick-buildpack/blob/master/LICENSE).
